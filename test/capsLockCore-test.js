@@ -1,19 +1,19 @@
 TestCase("test keypresses", {
 
   setUp: function() {
-    this.evCL     = {keyCode: 20};  // sim capslock event    
-    this.evLower  = {which: 107}; // sim lowercase alpha key
-    this.evUpper  = {which: 75};  // sim uppercase alpha key
-    this.evNumber = {which: 50}; // sim press number key
-    this.evSymbol = {which: 38, shiftKey: true}; // sim press '#'
-    this.evLower  = {which: 107}; // sim lowercase alpha key
+    this.evCL     = {keyCode: 20}; // capslock key
+    this.evLower  = {which: 107};  // lowercase alpha key
+    this.evUpper  = {which: 75, shiftKey: true};  // upper alpha key
+    this.evNumber = {which: 50};   // number key
+    this.evSymbol = {which: 38, shiftKey: true};  // press '#'
+    this.evEnter  = {which: 13};   // Enter key
     // with shift key held down
     // these simulate have CapsLock already pressed
-    this.evLowerShift = {which: 70, shiftKey: true};
-    this.evUpperShift = {which: 99, shiftKey: true};
+    this.evLowerShift   = {which: 107, shiftKey: true};
+    this.evUpperNoShift = {which: 75, shiftKey: false};
     capslock.reset();
   },
-  
+
   "test capsLockPressed using e.which": function() {
     assertTrue(capslock.wasCapsLockPressed(this.evCL));
     assertFalse(capslock.wasCapsLockPressed(this.evLower));
@@ -29,42 +29,42 @@ TestCase("test keypresses", {
 
   "test wasCapsLockPressed does not set capsLock status": function() {
     assertTrue( capslock.wasCapsLockPressed(this.evCL) );
-    assertUndefined( capslock.isCapsLockOn() );
+    assertNull( capslock.isCapsLockOn() );
 
     assertFalse( capslock.wasCapsLockPressed(this.evLower) );
-    assertUndefined( capslock.isCapsLockOn() );
+    assertNull( capslock.isCapsLockOn() );
 
     assertTrue( capslock.wasCapsLockPressed(this.evCL) );
-    assertUndefined( capslock.isCapsLockOn() );
+    assertNull( capslock.isCapsLockOn() );
   },
 
   "test only pressing capsLock before other keys does not set capsLock status": function() {
-    assertUndefined( capslock.checkCapsLock(this.evCL) );
-    assertUndefined( capslock.isCapsLockOn() );
+    assertNull( capslock.checkCapsLock(this.evCL) );
+    assertNull( capslock.isCapsLockOn() );
 
-    assertUndefined( capslock.checkCapsLock(this.evCL) );
-    assertUndefined( capslock.checkCapsLock(this.evCL) );
-    assertUndefined( capslock.isCapsLockOn() );
+    assertNull( capslock.checkCapsLock(this.evCL) );
+    assertNull( capslock.checkCapsLock(this.evCL) );
+    assertNull( capslock.isCapsLockOn() );
 
-    assertUndefined( capslock.checkCapsLock(this.evCL) );
-    assertUndefined( capslock.isCapsLockOn() );
+    assertNull( capslock.checkCapsLock(this.evCL) );
+    assertNull( capslock.isCapsLockOn() );
   },
 
   "test pressing CapsLock toggles state after non-CapsLock key pressed": function() {
-    assertUndefined( capslock.isCapsLockOn() );
+    assertNull( capslock.isCapsLockOn() );
 
     assertFalse( capslock.checkCapsLock(this.evLower) );
     assertFalse( capslock.isCapsLockOn() );
 
     assertTrue( capslock.checkCapsLock(this.evCL) );
     assertTrue( capslock.isCapsLockOn() );
-        
+
     assertFalse( capslock.checkCapsLock(this.evCL) );
     assertFalse( capslock.isCapsLockOn() );
   },
 
-  "test simulate keys without capsLock on": function() {
-    assertUndefined( capslock.isCapsLockOn() );
+  "test simulate keys WITHOUT capsLock on": function() {
+    assertNull( capslock.isCapsLockOn() );
 
     assertFalse( capslock.checkCapsLock(this.evLower) );
     assertFalse( capslock.isCapsLockOn() );
@@ -79,6 +79,49 @@ TestCase("test keypresses", {
     assertFalse( capslock.isCapsLockOn() );
 
     assertFalse( capslock.checkCapsLock(this.evSymbol) );
-    assertFalse( capslock.isCapsLockOn() );  
+    assertFalse( capslock.isCapsLockOn() );
+  },
+
+  "test simulate keys WITH capsLock on": function() {
+    assertNull( capslock.isCapsLockOn() );
+
+    // get a lower case key with Shift down => CapsLock is on
+    assertTrue( capslock.checkCapsLock(this.evLowerShift) );
+    assertTrue( capslock.isCapsLockOn() );
+
+    // caps lock still on
+    assertTrue( capslock.checkCapsLock(this.evSymbol) );
+    assertTrue( capslock.isCapsLockOn() );
+    assertTrue( capslock.checkCapsLock(this.evNumber) );
+    assertTrue( capslock.isCapsLockOn() );
+    assertTrue( capslock.checkCapsLock(this.evUpperNoShift) );
+    assertTrue( capslock.isCapsLockOn() );
+    assertTrue( capslock.checkCapsLock(this.evLowerShift) );
+    assertTrue( capslock.isCapsLockOn() );
+
+    // caps lock pressed - capsLock goes off
+    assertFalse( capslock.checkCapsLock(this.evCL) );
+    assertFalse( capslock.checkCapsLock(this.evSymbol) );
+    assertFalse( capslock.isCapsLockOn() );
+    assertFalse( capslock.checkCapsLock(this.evNumber) );
+    assertFalse( capslock.isCapsLockOn() );
+    assertFalse( capslock.checkCapsLock(this.evUpper) );
+    assertFalse( capslock.isCapsLockOn() );
+    assertFalse( capslock.checkCapsLock(this.evLower) );
+    assertFalse( capslock.isCapsLockOn() );
+  },
+
+  "test lower case key with Shift turns capsLock state on": function() {
+    assertNull( capslock.isCapsLockOn() );
+
+    assertTrue( capslock.checkCapsLock(this.evLowerShift) );
+    assertTrue( capslock.isCapsLockOn() );
+  },
+
+  "test upper case key without Shift turns capsLock state on": function() {
+    assertNull( capslock.isCapsLockOn() );
+
+    assertTrue( capslock.checkCapsLock(this.evUpperNoShift) );
+    assertTrue( capslock.isCapsLockOn() );
   }
 });

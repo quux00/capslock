@@ -1,8 +1,8 @@
 var capslock = (function() {
   // keep track of whether capslock is on
   // three states: yes, no, unknown
-  // unknown until first non-CapsLock key is pressed
-  var capsLockOn; 
+  // unknown (null) until first non-CapsLock key is pressed
+  var capsLockOn = null;
 
   /* ---[ Private Helper Methods ]--- */
   
@@ -53,10 +53,12 @@ var capslock = (function() {
   function checkCapsLock(e) {
     if (!e) return capsLockOn;
     var charCode = getCharCode(e);
-    if ( isLowerCaseAlphaKey(charCode) ) {
-      capsLockOn = !!e.shiftKey;
-    } else if (wasCapsLockPressed(e)) {
+    if ( wasCapsLockPressed(e) ) {
       toggleCapsLockState();
+    } else if ( isLowerCaseAlphaKey(charCode) ) {
+      capsLockOn = !!e.shiftKey;
+    } else if ( isUpperCaseAlphaKey(charCode) ) {
+      capsLockOn = !!!e.shiftKey;
     }
     return capsLockOn;
   }
@@ -66,7 +68,7 @@ var capslock = (function() {
   }
 
   function reset() {
-    capsLockOn = undefined;
+    capsLockOn = null;
   }
   
   return {checkCapsLock: checkCapsLock,
@@ -78,16 +80,16 @@ var capslock = (function() {
 
 
   /**
-   * Can be called with or without a keypress event
-   * If no keypress event passed in, then it returns the
-   * last known state of the capsLock key.
-   * If keypress event passed in, the keypress is evaluated
-   * as to whether the capsLock is on or not.
+   * The keypress or keyup event is evaluated as to whether the
+   * capsLock is on or not.
+   * NOTE: a keyup event should be passed in to detect if the CapsLock
+   *       key itself was pressed; otherwise pass in a keypress event
    * 
+   * @param  keypress event or keyup event
    * @return true      if CapsLock key is known to be on
    *         false     if known not to be on
    *         undefined if not known (when no keys have been
    *                   pressed or the only the key pressed
    *                   so far is Caps Lock)
    */
-// isCapsLockOn
+// checkCapsLock
