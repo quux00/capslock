@@ -14,22 +14,43 @@ var capslock = (function() {
     if (typeof capsLockOn === 'boolean') capsLockOn = !capsLockOn;
   }
 
-  function isLowerCaseAlphaKey(charCode) {
+  function isUpperCaseAlphaKey(charCode) {
     return (charCode >= 65 && charCode <= 90);
   }
   
-  function isUpperCaseAlphaKey(charCode) {
+  function isLowerCaseAlphaKey(charCode) {
     return (charCode >= 97 && charCode <= 122);
   }
+
+  // function isLowerCaseNumber(charCode) {
+  //   return (charCode >= 48 && charCode <= 57);
+  // }
+
+  // function isUpperCaseNumber(charCode) {
+  //   switch (String.fromCharCode(charCode)) {
+  //     case '!': return true;
+  //     case '@': return true;
+  //     case '#': return true;
+  //     case '$': return true;
+  //     case '%': return true;
+  //     case '^': return true;
+  //     case '&': return true;
+  //     case '*': return true;
+  //     case '(': return true;
+  //     case ')': return true;
+  //     case '_': return true;
+  //     case '+': return true;
+  //     default:  return false;
+  //   }
+  // }
+
+  /* ---[ Public Methods ]--- */
 
   function wasCapsLockPressed(e) {
     return getCharCode(e) === 20;
   }
 
-  
-  /* ---[ Public Methods ]--- */
-
-  function isCapsLockOn(e, fn) {
+  function checkCapsLock(e) {
     if (!e) return capsLockOn;
     var charCode = getCharCode(e);
     if ( isLowerCaseAlphaKey(charCode) ) {
@@ -39,8 +60,19 @@ var capslock = (function() {
     }
     return capsLockOn;
   }
+  
+  function isCapsLockOn() {
+    return capsLockOn;
+  }
 
-  return {isCapsLockOn: isCapsLockOn};
+  function reset() {
+    capsLockOn = undefined;
+  }
+  
+  return {checkCapsLock: checkCapsLock,
+          isCapsLockOn: isCapsLockOn,
+          wasCapsLockPressed: wasCapsLockPressed,
+          reset: reset};
 })();
 
 
