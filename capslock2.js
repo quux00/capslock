@@ -46,50 +46,20 @@
   }
   
   function handler(e) {
-    if ( capsLockCore.capsLockChanged(e) ) {
-      if (capsLockCore.isCapsLockOn()) {
-        capsLockOn();
-      } else {
-        capsLockOff();
-      }
+    var state = capsLockCore.analyzeEvent(e);
+    if (state.changed) {
+      if (state.on) capsLockOn();
+      else          capsLockOff();
     }
-  }
-  
-  // LEFT OFF: not yet tested
-  function checkForCapsLock(e) {
-    console.log(">>>>" + capsLockCore.isCapsLockOn());
-    console.log(e.type);
-    console.log(e);
-    return;
-    if (e.type === 'keyup') {
-      if ( capsLockCore.wasCapsLockPressed(e) ) {
-        capsLockCore.checkCapsLock(e);
-        
-      }
-    }
-
-    var prev = capsLockCore.isCapsLockOn();
-    var curr = capsLockCore.checkCapsLock(e);
-    if (prev === curr) return;
-
-    if (curr) {
-      removeClass(warningElem, "hidden");
-      addClass(warningElem, "visible")
-    } else {
-      removeClass(warningElem, "visible");
-      addClass(warningElem, "hidden")
-    }
-    console.log("<<<<<" + capsLockCore.isCapsLockOn());
   }
   
   var login = byId("login-field");
   var passw = byId("password-field");
 
-  bindEvent(login, "keypress", checkForCapsLock);
-  // bindEvent(passw, "keypress", checkForCapsLock);
-  bindEvent(login, "keyup", checkForCapsLock);
-  bindEvent(login, "keydown", checkForCapsLock);
-  // bindEvent(passw, "keyup", checkForCapsLock);
+  bindEvent(login, "keypress", handler);
+  bindEvent(passw, "keypress", handler);
+  bindEvent(login, "keydown", handler);
+  bindEvent(passw, "keydown", handler);
 })();
 
 

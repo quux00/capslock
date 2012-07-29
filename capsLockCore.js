@@ -12,6 +12,7 @@ var capsLockCore = (function() {
 
   function toggleCapsLockState() {
     if (typeof capsLockOn === 'boolean') capsLockOn = !capsLockOn;
+    return capsLockOn;
   }
 
   function isUpperCaseAlphaKey(charCode) {
@@ -22,45 +23,33 @@ var capsLockCore = (function() {
     return (charCode >= 97 && charCode <= 122);
   }
 
-  // function isLowerCaseNumber(charCode) {
-  //   return (charCode >= 48 && charCode <= 57);
-  // }
-
-  // function isUpperCaseNumber(charCode) {
-  //   switch (String.fromCharCode(charCode)) {
-  //     case '!': return true;
-  //     case '@': return true;
-  //     case '#': return true;
-  //     case '$': return true;
-  //     case '%': return true;
-  //     case '^': return true;
-  //     case '&': return true;
-  //     case '*': return true;
-  //     case '(': return true;
-  //     case ')': return true;
-  //     case '_': return true;
-  //     case '+': return true;
-  //     default:  return false;
-  //   }
-  // }
-
-  /* ---[ Public Methods ]--- */
-
-  function wasCapsLockPressed(e) {
+  function capsLockPressed(e) {
     return getCharCode(e) === 20;
   }
 
-  function checkCapsLock(e) {
-    if (!e) return capsLockOn;
+  function keyPress(e) {
     var charCode = getCharCode(e);
-    if ( wasCapsLockPressed(e) ) {
-      toggleCapsLockState();
-    } else if ( isLowerCaseAlphaKey(charCode) ) {
+    if ( isLowerCaseAlphaKey(charCode) ) {
       capsLockOn = !!e.shiftKey;
     } else if ( isUpperCaseAlphaKey(charCode) ) {
       capsLockOn = !!!e.shiftKey;
     }
     return capsLockOn;
+  }
+  
+  /* ---[ Public Methods ]--- */
+
+  function analyzeEvent(e) {
+    var prev = capsLockOn;
+    if (e) {
+      if ( (e.type === 'keydown' || e.type === 'keyup') && capsLockPressed(e) ) {
+        toggleCapsLockState();
+      } else if (e.type === 'keypress') {
+        keyPress(e);
+      }
+    }
+    return {changed: prev !== capsLockOn,
+            on: capsLockOn};
   }
   
   function isCapsLockOn() {
@@ -71,9 +60,8 @@ var capsLockCore = (function() {
     capsLockOn = null;
   }
   
-  return {checkCapsLock: checkCapsLock,
+  return {analyzeEvent: analyzeEvent,
           isCapsLockOn: isCapsLockOn,
-          wasCapsLockPressed: wasCapsLockPressed,
           reset: reset};
 })();
 
