@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <style>
+      .warn {
+        color: #c00;
+      }
+      .visible {
+        visibility: visible;
+      }
+      .hidden {
+        visibility: hidden;
+      }
+      body {
+        width: 450px;
+        margin: 0 auto;
+        text-align: center;
+      }
+    </style>
+
+  </head>
+  <body>
+    <div>
+      Login: <br>
+      <input type="text" id="login-field"><br />
+      <input type="password" id="password-field"><br />
+      <div id="warning" class="warn hidden">Warning: Caps Lock is On</div>
+    </div>
+    <script src="capsLockCore.js"></script>
+    <script src="capslock2.js"></script>
+  </body>
+</html>

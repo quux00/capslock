@@ -1,4 +1,4 @@
-var capslock = (function() {
+var capsLockCore = (function() {
   // keep track of whether capslock is on
   // three states: yes, no, unknown
   // unknown (null) until first non-CapsLock key is pressed
@@ -76,7 +76,6 @@ var capslock = (function() {
           wasCapsLockPressed: wasCapsLockPressed,
           reset: reset};
 })();
-
 
 
   /**
