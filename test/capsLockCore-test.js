@@ -247,10 +247,16 @@ TestCase("test keypresses", {
   }
 });
 
-TestCase("test capsLockEventHandler", {
+TestCase("test eventHandler", {
   setUp: function() {
-    this.evKeyP  = {type: 'keypress'};
-    this.evKeyD  = {type: 'keydown'};
+    // these cause 'capsLockOn' to be false
+    this.evLowerKeyP      = {which: 107, type: 'keypress'};
+    this.evLowerShiftKeyP = {which: 107, shiftKey: true, type: 'keypress'};
+
+    // these cause 'capsLockOn' to be true
+    this.evUpperKeyDown      = {which: 75, shiftKey: true, type: 'keydown'};
+    this.evUpperNoShiftKeyUp = {which: 75, shiftKey: false, type: 'keyup'};
+
     this.evFocus = {type: 'focus'};
     this.evBlur  = {type: 'blur'};
 
@@ -266,20 +272,58 @@ TestCase("test capsLockEventHandler", {
       capsLockOff: function() {
         this.offCalled += 1;
       },
-      focus: function() {
+      focus: function(val) {
         this.focusCalled += 1;
       },
-      blue: function() {
+      blur: function(val) {
         this.blurCalled += 1;
+      },
+
+      reset: function() {
+        this.onCalled = this.offCalled = this.focusCalled = this.blurCalled = 0;
       }
     };
   },
   
-  "test capsLockEventHandler: focus events":
+  tearDown: function() {
+    this.fnmap.reset();
+  },
+
+  "test eventHandler: focus and blur events":
   function() {
-    assertEquals(0, this.fnmap.onCalled);
+    assertEquals(0, this.fnmap.blurCalled);
     assertEquals(0, this.fnmap.focusCalled);
+
     this.fnmap.focus();
     assertEquals(1, this.fnmap.focusCalled);
+
+    capsLockCore.eventHandler(this.evFocus, this.fnmap);
+    assertEquals(2, this.fnmap.focusCalled);
+    assertEquals(0, this.fnmap.blurCalled);
+
+    capsLockCore.eventHandler(this.evFocus, this.fnmap);
+    assertEquals(3, this.fnmap.focusCalled);
+    assertEquals(0, this.fnmap.blurCalled);
+
+    capsLockCore.eventHandler(this.evBlur, this.fnmap);
+    assertEquals(3, this.fnmap.focusCalled);
+    assertEquals(1, this.fnmap.blurCalled);
+  },
+
+  "test eventHandler: keypress events":
+  function() {
+    assertEquals(0, this.fnmap.onCalled);
+    assertEquals(0, this.fnmap.offCalled);
+
+    capsLockCore.eventHandler(this.evLowerKeyP, this.fnmap);
+    assertEquals(0, this.fnmap.onCalled);
+    assertEquals(1, this.fnmap.offCalled);
+
+    // calling it again does NOT inc offCalled, bcs the callback
+    // is invoked only if the state of the CapsLock has changed
+    capsLockCore.eventHandler(this.evLowerKeyP, this.fnmap);
+    assertEquals(0, this.fnmap.onCalled);
+    assertEquals(1, this.fnmap.offCalled);
+
   }
 });

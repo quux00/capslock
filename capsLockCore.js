@@ -61,8 +61,8 @@ var capsLockCore = (function() {
   }
 
   // DOM event handler for username field
-  function capsLockEventHandler(e, fnmap) {
-    if (e.type =~ /^key/) {
+  function eventHandler(e, fnmap) {
+    if (/^key/.test(e.type)) {
       var state = analyzeEvent(e);
       if (state.changed) {
         state.on ? fnmap.capsLockOn() : fnmap.capsLockOff();
@@ -71,12 +71,12 @@ var capsLockCore = (function() {
       fnmap[e.type]( capsLockCore.isCapsLockOn() );
     }
   }
-  
-  
+
+  // return methods that are publicly available
   return {analyzeEvent: analyzeEvent,
           isCapsLockOn: isCapsLockOn,
           reset: reset,
-          capsLockEventHandler: capsLockEventHandler};
+          eventHandler: eventHandler};
 })();
 
 
