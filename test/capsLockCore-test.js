@@ -1,9 +1,9 @@
-TestCase("test keypresses", {
+TestCase("test capsLockCore.analyzeEvent", {
 
   setUp: function() {
     // capslock key
-    this.evCL     = {keyCode: 20, type: 'keyup'}; 
-    this.evCLd    = {keyCode: 20, type: 'keydown'}; 
+    this.evCL     = {keyCode: 20, type: 'keyup'};
+    this.evCLd    = {keyCode: 20, type: 'keydown'};
     // lowercase alpha key
     this.evLower  = {which: 107, type: 'keypress'};
     // upper alpha key
@@ -13,7 +13,7 @@ TestCase("test keypresses", {
     // press '#'
     this.evSymbol = {which: 38, shiftKey: true, type: 'keypress'};
     // Enter key
-    this.evEnter  = {which: 13, type: 'keypress'};   
+    this.evEnter  = {which: 13, type: 'keypress'};
     // with shift key held down
     // these simulate have CapsLock already pressed
     this.evLowerShift   = {which: 107, shiftKey: true, type: 'keypress'};
@@ -26,7 +26,6 @@ TestCase("test keypresses", {
     // click event
     this.evClick = {type: 'click'};
 
-    
     capsLockCore.reset();
   },
 
@@ -66,7 +65,7 @@ TestCase("test keypresses", {
   function() {
     var state;
     assertNull( capsLockCore.isCapsLockOn() );
-    
+
     state = capsLockCore.analyzeEvent(this.evLower);
     assertTrue( state.changed );
     assertFalse( state.on )
@@ -201,12 +200,12 @@ TestCase("test keypresses", {
   "test alpha keys have no effect on keyup/down events": function() {
     var state;
     assertNull( capsLockCore.isCapsLockOn() );
-    
+
     state = capsLockCore.analyzeEvent(this.evLower_keyUp);
     assertFalse( state.changed );
     assertNull( state.on );
     assertNull( capsLockCore.isCapsLockOn() );
-    
+
     // now set state with a keypress event
     state = capsLockCore.analyzeEvent(this.evUpperNoShift);
     assertTrue( state.changed );
@@ -218,22 +217,22 @@ TestCase("test keypresses", {
     assertFalse( state.changed );
     assertTrue( state.on );
     assertTrue( capsLockCore.isCapsLockOn() );
-    
+
     state = capsLockCore.analyzeEvent(this.evLowerShift_keyDown);
     assertFalse( state.changed );
     assertTrue( state.on );
-    assertTrue( capsLockCore.isCapsLockOn() );    
+    assertTrue( capsLockCore.isCapsLockOn() );
   },
 
   "test giving non key event (click) should not change state": function() {
     var state;
     assertNull( capsLockCore.isCapsLockOn() );
-    
+
     state = capsLockCore.analyzeEvent(this.evClick);
     assertFalse( state.changed );
     assertNull( state.on );
     assertNull( capsLockCore.isCapsLockOn() );
-    
+
     // now set state with a keypress event
     state = capsLockCore.analyzeEvent(this.evUpperNoShift);
     assertTrue( state.changed );
@@ -247,15 +246,19 @@ TestCase("test keypresses", {
   }
 });
 
-TestCase("test eventHandler", {
+TestCase("test capsLockCore.eventHandler", {
   setUp: function() {
-    // these cause 'capsLockOn' to be false
-    this.evLowerKeyP      = {which: 107, type: 'keypress'};
+    // causes 'capsLockOn' to be false
+    this.evLowerKeyP    = {which: 107, type: 'keypress'};
+
+    // causes 'capsLockOn' to be true
     this.evLowerShiftKeyP = {which: 107, shiftKey: true, type: 'keypress'};
 
-    // these cause 'capsLockOn' to be true
-    this.evUpperKeyDown      = {which: 75, shiftKey: true, type: 'keydown'};
+    // these are keyup/down so should have no effect
     this.evUpperNoShiftKeyUp = {which: 75, shiftKey: false, type: 'keyup'};
+    this.evUpperKeyDown = {which: 75, shiftKey: true, type: 'keydown'};
+
+    this.evCL = {keyCode: 20, type: 'keyup'};
 
     this.evFocus = {type: 'focus'};
     this.evBlur  = {type: 'blur'};
@@ -284,9 +287,10 @@ TestCase("test eventHandler", {
       }
     };
   },
-  
+
   tearDown: function() {
     this.fnmap.reset();
+    capsLockCore.reset();
   },
 
   "test eventHandler: focus and blur events":
@@ -310,11 +314,14 @@ TestCase("test eventHandler", {
     assertEquals(1, this.fnmap.blurCalled);
   },
 
-  "test eventHandler: keypress events":
+  "test eventHandler: keypress events - lower/upper case keys":
   function() {
     assertEquals(0, this.fnmap.onCalled);
     assertEquals(0, this.fnmap.offCalled);
+    assertEquals(0, this.fnmap.blurCalled);
+    assertEquals(0, this.fnmap.focusCalled);
 
+    // caps lock off, change from "unknown" state
     capsLockCore.eventHandler(this.evLowerKeyP, this.fnmap);
     assertEquals(0, this.fnmap.onCalled);
     assertEquals(1, this.fnmap.offCalled);
@@ -322,8 +329,84 @@ TestCase("test eventHandler", {
     // calling it again does NOT inc offCalled, bcs the callback
     // is invoked only if the state of the CapsLock has changed
     capsLockCore.eventHandler(this.evLowerKeyP, this.fnmap);
+    assertFalse( capsLockCore.isCapsLockOn() );
     assertEquals(0, this.fnmap.onCalled);
     assertEquals(1, this.fnmap.offCalled);
 
+    // should cause CapsLock state to turn true
+    capsLockCore.eventHandler(this.evLowerShiftKeyP, this.fnmap);
+    assertTrue( capsLockCore.isCapsLockOn() );
+    assertEquals(1, this.fnmap.onCalled);
+    assertEquals(1, this.fnmap.offCalled);
+
+    // no change in state, so no callbacks made
+    capsLockCore.eventHandler(this.evLowerShiftKeyP, this.fnmap);
+    assertTrue( capsLockCore.isCapsLockOn() );
+    assertEquals(1, this.fnmap.onCalled);
+    assertEquals(1, this.fnmap.offCalled);
+
+    // shift back to capslock off
+    capsLockCore.eventHandler(this.evLowerKeyP, this.fnmap);
+    assertEquals(1, this.fnmap.onCalled);
+    assertEquals(2, this.fnmap.offCalled);
+    assertEquals(0, this.fnmap.blurCalled);
+    assertEquals(0, this.fnmap.focusCalled);
+  },
+
+  "test eventHandler: only capsLock pressed - no callback":
+  function() {
+    assertEquals(0, this.fnmap.onCalled);
+    assertEquals(0, this.fnmap.offCalled);
+    assertEquals(0, this.fnmap.blurCalled);
+    assertEquals(0, this.fnmap.focusCalled);
+
+    // caps lock pressed - can't tell state, so no change/callback
+    capsLockCore.eventHandler(this.evCL, this.fnmap);
+    assertNull( capsLockCore.isCapsLockOn() );
+    assertEquals(0, this.fnmap.onCalled);
+    assertEquals(0, this.fnmap.offCalled);
+    assertEquals(0, this.fnmap.blurCalled);
+    assertEquals(0, this.fnmap.focusCalled);
+  },
+
+  "test eventHandler: non-capsLock keyup/down events - no callback":
+  function() {
+    // key up/down of non-CL keys have no effect
+    capsLockCore.eventHandler(this.evUpperNoShiftKeyUp, this.fnmap);
+    assertNull( capsLockCore.isCapsLockOn() );
+    assertEquals(0, this.fnmap.onCalled);
+    assertEquals(0, this.fnmap.offCalled);
+
+    // key up/down of non-CL keys have no effect
+    capsLockCore.eventHandler(this.evUpperKeyDown, this.fnmap);
+    assertNull( capsLockCore.isCapsLockOn() );
+    assertEquals(0, this.fnmap.onCalled);
+    assertEquals(0, this.fnmap.offCalled);
+  },
+
+  "test eventHandler: capsLock triggers callback once state known":
+  function() {
+    capsLockCore.eventHandler(this.evLowerShiftKeyP, this.fnmap);
+    assertTrue( capsLockCore.isCapsLockOn() );
+    assertEquals(1, this.fnmap.onCalled);
+    assertEquals(0, this.fnmap.offCalled);
+
+    // should toggle to off
+    capsLockCore.eventHandler(this.evCL, this.fnmap);
+    assertFalse( capsLockCore.isCapsLockOn() );
+    assertEquals(1, this.fnmap.onCalled);
+    assertEquals(1, this.fnmap.offCalled);
+
+    // should toggle to on
+    capsLockCore.eventHandler(this.evCL, this.fnmap);
+    assertTrue( capsLockCore.isCapsLockOn() );
+    assertEquals(2, this.fnmap.onCalled);
+    assertEquals(1, this.fnmap.offCalled);
+
+    // should toggle to off
+    capsLockCore.eventHandler(this.evCL, this.fnmap);
+    assertFalse( capsLockCore.isCapsLockOn() );
+    assertEquals(2, this.fnmap.onCalled);
+    assertEquals(2, this.fnmap.offCalled);
   }
 });
