@@ -1,22 +1,22 @@
+Function.prototype.partial = function() {
+  var fn = this,
+      args = Array.prototype.slice.call(arguments);
+
+  return function() {
+    var arg = 0,
+        iargs = args.slice();
+    for (var i = 0; i < args.length && arg < arguments.length; i++) {
+      if (args[i] === undefined) {
+        iargs[i] = arguments[arg++];
+      }
+    }
+    return fn.apply(this, iargs.concat( Array.prototype.slice.call(arguments, arg) ));
+  };
+};
+
 (function() {
 
   /* ---[ Helper Functions ]--- */
-  Function.prototype.partial = function() {
-    var fn = this,
-        args = Array.prototype.slice.call(arguments);
-  
-    return function() {
-      var arg = 0,
-          iargs = args.slice();
-      for (var i = 0; i < args.length && arg < arguments.length; i++) {
-        if (args[i] === undefined) {
-          iargs[i] = arguments[arg++];
-        }
-      }
-      return fn.apply(this, iargs.concat( Array.prototype.slice.call(arguments, arg) ));
-    };
-  };
-
 
   function byId(id) {
     return document.getElementById(id);
@@ -48,29 +48,34 @@
 
   /* ---[ Main Body ]--- */
 
-  var warningOn = true;
-  var warningElem = byId("warning");
+  // make sure capsLock state is set to unknown on (re)load
   capsLockCore.reset();
-  console.log("...." + capsLockCore.isCapsLockOn());
 
-  // coupled
-  function capsLockOn() {
-    removeClass(warningElem, "hidden");
-    addClass(warningElem, "visible")
+  function addWarning(elem) {
+    removeClass(elem, "hidden");
+    addClass(elem, "visible")    
+  }
+  
+  function removeWarning(elem) {
+    removeClass(elem, "visible");
+    addClass(elem, "hidden")
   }
 
-  // coupled
-  function capsLockOff() {
-    removeClass(warningElem, "visible");
-    addClass(warningElem, "hidden")
-  }
+  var clOnUsername  = addWarning.partial(byId("above-warning"));
+  var clOnPassword  = addWarning.partial(byId("below-warning"));
+  var clOffUsername = removeWarning.partial(byId("above-warning"));
+  var clOffPassword = removeWarning.partial(byId("below-warning"));
+  
+  var unameHandler = checkCapsLock.partial(undefined,
+                                           clOnUsername,
+                                           clOffUsername);
+  var passwHandler = checkCapsLock.partial(undefined,
+                                           clOnPassword,
+                                           clOffPassword);
 
-  // coupled
-  function handler(e) {
-    checkCapsLock(e, capsLockOn, capsLockOff);
-  }
-
-  var h2 = checkCapsLock.partial(undefined, capsLockOn, capsLockOff);
+  // var loginHandler = function(e) {
+  //   if (e.type === 'blur')
+  // }
   
   // generic
   function checkCapsLock(e, fnOn, fnOff) {
@@ -80,27 +85,16 @@
     }
   }
 
+  // // coupled
+  // function handler(e) {
+  //   checkCapsLock(e, capsLockOn, capsLockOff);
+  // }
+  
   var login = byId("login-field");
   var passw = byId("password-field");
 
-  bindEvent(login, "keypress", h2);
-  bindEvent(passw, "keypress", h2);
-  bindEvent(login, "keydown", h2);
-  bindEvent(passw, "keydown", h2);
+  bindEvent(login, "keypress", unameHandler);
+  bindEvent(passw, "keypress", passwHandler);
+  bindEvent(login, "keydown",  unameHandler);
+  bindEvent(passw, "keydown",  passwHandler);
 })();
-
-
-
-  // function toggleWarning(e) {
-  //   warningOn = !warningOn;
-  //   var caller = e.target || e.srcElement;
-  //   if (warningOn) {
-  //     removeClass(warningElem, "visible");
-  //     addClass(warningElem, "hidden")
-  //     addClass(warningElem, "hidden")
-  //     addClass(warningElem, "hidden")
-  //   } else {
-  //     removeClass(warningElem, "hidden");
-  //     addClass(warningElem, "visible")
-  //   }
-  // }

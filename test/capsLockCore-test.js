@@ -30,7 +30,8 @@ TestCase("test keypresses", {
     capsLockCore.reset();
   },
 
-  "test press CapsLock first does not set capsLock status": function() {
+  "test press CapsLock first does not set capsLock status":
+  function() {
     var state;
     assertNull( capsLockCore.isCapsLockOn() );
 
@@ -61,7 +62,8 @@ TestCase("test keypresses", {
     // console.log("stateChanged: " + state.changed +
     //             "; capsLockOn: " + state.on);
 
-  "test pressing CapsLock toggles state after non-CapsLock key pressed": function() {
+  "test pressing CapsLock toggles state after non-CapsLock key pressed":
+  function() {
     var state;
     assertNull( capsLockCore.isCapsLockOn() );
     
@@ -88,7 +90,8 @@ TestCase("test keypresses", {
     assertTrue( capsLockCore.isCapsLockOn() );
   },
 
-  "test simulate keys WITHOUT capsLock on": function() {
+  "test simulate keys WITHOUT capsLock on":
+  function() {
     var state;
     assertNull( capsLockCore.isCapsLockOn() );
 
@@ -119,7 +122,8 @@ TestCase("test keypresses", {
 
   },
 
-  "test simulate keys WITH capsLock on": function() {
+  "test simulate keys WITH capsLock on":
+  function() {
     var state;
     assertNull( capsLockCore.isCapsLockOn() );
 
@@ -172,7 +176,8 @@ TestCase("test keypresses", {
     assertFalse( capsLockCore.isCapsLockOn() );
   },
 
-  "test lower case key with Shift turns capsLock state on": function() {
+  "test lower case key with Shift turns capsLock state on":
+  function() {
     var state;
     assertNull( capsLockCore.isCapsLockOn() );
 
@@ -182,7 +187,8 @@ TestCase("test keypresses", {
     assertTrue( capsLockCore.isCapsLockOn() );
   },
 
-  "test upper case key without Shift turns capsLock state on": function() {
+  "test upper case key without Shift turns capsLock state on":
+  function() {
     var state;
     assertNull( capsLockCore.isCapsLockOn() );
 
@@ -238,5 +244,42 @@ TestCase("test keypresses", {
     assertFalse( state.changed );
     assertTrue( state.on );
     assertTrue( capsLockCore.isCapsLockOn() );
+  }
+});
+
+TestCase("test capsLockEventHandler", {
+  setUp: function() {
+    this.evKeyP  = {type: 'keypress'};
+    this.evKeyD  = {type: 'keydown'};
+    this.evFocus = {type: 'focus'};
+    this.evBlur  = {type: 'blur'};
+
+    this.fnmap = {
+      onCalled: 0,
+      offCalled: 0,
+      focusCalled: 0,
+      blurCalled: 0,
+
+      capsLockOn: function() {
+        this.onCalled += 1;
+      },
+      capsLockOff: function() {
+        this.offCalled += 1;
+      },
+      focus: function() {
+        this.focusCalled += 1;
+      },
+      blue: function() {
+        this.blurCalled += 1;
+      }
+    };
+  },
+  
+  "test capsLockEventHandler: focus events":
+  function() {
+    assertEquals(0, this.fnmap.onCalled);
+    assertEquals(0, this.fnmap.focusCalled);
+    this.fnmap.focus();
+    assertEquals(1, this.fnmap.focusCalled);
   }
 });

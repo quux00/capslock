@@ -59,10 +59,24 @@ var capsLockCore = (function() {
   function reset() {
     capsLockOn = null;
   }
+
+  // DOM event handler for username field
+  function capsLockEventHandler(e, fnmap) {
+    if (e.type =~ /^key/) {
+      var state = analyzeEvent(e);
+      if (state.changed) {
+        state.on ? fnmap.capsLockOn() : fnmap.capsLockOff();
+      }
+    } else if (fnmap[e.type]) {
+      fnmap[e.type]( capsLockCore.isCapsLockOn() );
+    }
+  }
+  
   
   return {analyzeEvent: analyzeEvent,
           isCapsLockOn: isCapsLockOn,
-          reset: reset};
+          reset: reset,
+          capsLockEventHandler: capsLockEventHandler};
 })();
 
 

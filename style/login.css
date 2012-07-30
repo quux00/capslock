@@ -1,0 +1,14 @@
+.warn {
+  color: #c00;
+}
+.visible {
+  visibility: visible;
+}
+.hidden {
+  visibility: hidden;
+}
+div#loginDiv {
+  width: 450px;
+  margin: 0 auto;
+  text-align: center;
+}
