@@ -37,7 +37,7 @@ Function.prototype.partial = function() {
   }
 
   // main namespace module to be returned
-  var capslock = {
+  var capsLock = {
     
     addClass: function(elem, cname) {
       elem.className += " " + cname;
@@ -46,21 +46,10 @@ Function.prototype.partial = function() {
     removeClass: function(elem, cname) {
       var re = new RegExp("(?:^|\\s)" + cname + "(?!\\S)", 'g');
       elem.className = elem.className.replace(re, '');
-    },
-
-    // DOM event handler for username field
-    capsLockEventHandler: function(e, fnmap) {
-      if (e.type =~ /^key/) {
-        var state = capsLockCore.analyzeEvent(e);
-        if (state.changed) {
-          state.on ? fnmap.capsLockOn() : fn.capsLockOff();
-        }
-      } else if (fnmap[e.type]) {
-        fnmap[e.type]( capsLockCore.isCapsLockOn() );
-      }
     }
-  };
+
+  }; // end capslock namespace obj
 
   // Expose functions to the global object
-  window.capsLock = capslock;
+  window.capsLock = capsLock;
 })();
