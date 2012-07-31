@@ -43,6 +43,8 @@ describe("CapsLockFunctions", function() {
     var aw, bw;
     var awOrigClass, bwOrigClass;
 
+    var capsLockEventHandler;
+
     beforeEach(function() {
       if (!aw) aw = document.getElementById("aboveWarning");
       if (!bw) bw = document.getElementById("belowWarning");
@@ -65,6 +67,13 @@ describe("CapsLockFunctions", function() {
       evFocus = {type: 'focus'};
       evBlur  = {type: 'blur'};
 
+      capsLockEventHandler = function(elem) {
+        var h = new Handler(elem);
+        return function(e) {
+          capsLockCore.eventHandler(e, h);
+        }
+      }
+      
       function Handler(elem) {
         this.makeVisible = function(elem) {
           capsLock.addClass(elem, "visible");
@@ -75,10 +84,10 @@ describe("CapsLockFunctions", function() {
           capsLock.removeClass(elem, "visible");
         };
         this.capsLockOn = function() {
-          makeVisible(elem);
+          this.makeVisible(elem);
         };
         this.capsLockOff = function() {
-          makeHidden(elem);
+          this.makeHidden(elem);
         };
         this.focus = function(val) {
           if (val) this.capsLockOn();
@@ -89,47 +98,7 @@ describe("CapsLockFunctions", function() {
       }
 
       fnmapUpper = new Handler(aw);
-      fnmapLower = new Handler(bw);
-      
-      var makeVisible = function(elem) {
-        capsLock.addClass(elem, "visible");
-        capsLock.removeClass(elem, "hidden");
-      };
-
-      var makeHidden = function(elem) {
-        capsLock.addClass(elem, "hidden");
-        capsLock.removeClass(elem, "visible");
-      };
-
-      fnmapUpperOld = {
-        capsLockOn: function() {
-          makeVisible(aw);
-        },
-        capsLockOff: function() {
-          makeHidden(aw);
-        },
-        focus: function(val) {
-          if (val) this.capsLockOn();
-        },
-        blur: function(val) {
-          this.capsLockOff();
-        }
-      };
-
-      fnmapLowerOld = {
-        capsLockOn: function() {
-          makeVisible(bw);
-        },
-        capsLockOff: function() {
-          makeHidden(bw);
-        },
-        focus: function(val) {
-          if (val) this.capsLockOn();
-        },
-        blur: function(val) {
-          this.capsLockOff();
-        }
-      };
+      fnmapLower = new Handler(bw);      
     });
 
     afterEach(function() {
@@ -138,136 +107,202 @@ describe("CapsLockFunctions", function() {
       capsLockCore.reset();
     });
 
-    it("handles keypresses - upper field", function() {
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
+    describe("test capsLockCore.eventHandler directly", function() {
+      
+      it("handles keypresses - upper field", function() {
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
 
-      // test loginField (upper text field)
-      capsLockCore.eventHandler(evLowerShiftKeyP, fnmapUpper);
-      expect(aw.className).toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
+        // test loginField (upper text field)
+        capsLockCore.eventHandler(evLowerShiftKeyP, fnmapUpper);
+        expect(aw.className).toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
 
-      capsLockCore.eventHandler(evLowerShiftKeyP, fnmapUpper);
-      expect(aw.className).toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
+        capsLockCore.eventHandler(evLowerShiftKeyP, fnmapUpper);
+        expect(aw.className).toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
 
-      capsLockCore.eventHandler(evLowerShiftKeyP, fnmapUpper);
-      expect(aw.className).toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
+        capsLockCore.eventHandler(evLowerShiftKeyP, fnmapUpper);
+        expect(aw.className).toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+      });
+
+      it("handles keypresses - lower field", function() {
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        // test loginField (upper text field)
+        capsLockCore.eventHandler(evLowerShiftKeyP, fnmapLower);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).toMatch(/visible/);
+
+        capsLockCore.eventHandler(evLowerShiftKeyP, fnmapLower);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).toMatch(/visible/);
+
+        capsLockCore.eventHandler(evLowerShiftKeyP, fnmapLower);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).toMatch(/visible/);
+      });
+
+      it("handles CapsLock keyup/down events - upper field", function() {
+        // Pressing CapsLock first should have no effect
+        capsLockCore.eventHandler(evCL, fnmapUpper);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        capsLockCore.eventHandler(evCL, fnmapUpper);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        // after pressing another key, CapsLock should toggle warnings
+        capsLockCore.eventHandler(evLowerShiftKeyP, fnmapUpper);
+        expect(aw.className).toMatch(/visible/);
+
+        capsLockCore.eventHandler(evCL, fnmapUpper);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        capsLockCore.eventHandler(evCL, fnmapUpper);
+        expect(aw.className).toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+      });
+
+      it("handles CapsLock keyup/down events - lower field", function() {
+        // Pressing CapsLock first should have no effect
+        capsLockCore.eventHandler(evCL, fnmapLower);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        capsLockCore.eventHandler(evCL, fnmapLower);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        // after pressing another key, CapsLock should toggle warnings
+        capsLockCore.eventHandler(evLowerShiftKeyP, fnmapLower);
+        expect(bw.className).toMatch(/visible/);
+
+        capsLockCore.eventHandler(evCL, fnmapLower);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        capsLockCore.eventHandler(evCL, fnmapLower);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).toMatch(/visible/);
+      });
+
+      it("blur events remove warning", function() {
+        capsLockCore.eventHandler(evLowerKeyP, fnmapUpper);
+        expect(aw.className).not.toMatch(/visible/);
+
+        capsLockCore.eventHandler(evCL, fnmapUpper);
+        expect(aw.className).toMatch(/visible/);
+
+        capsLockCore.eventHandler(evBlur, fnmapUpper);
+        expect(aw.className).not.toMatch(/visible/);
+      });
+
+      it("blur events leave warning off", function() {
+        capsLockCore.eventHandler(evLowerKeyP, fnmapUpper);
+        expect(aw.className).not.toMatch(/visible/);
+
+        capsLockCore.eventHandler(evCL, fnmapUpper);
+        expect(aw.className).toMatch(/visible/);
+
+        capsLockCore.eventHandler(evCL, fnmapUpper);
+        expect(aw.className).not.toMatch(/visible/);
+
+        capsLockCore.eventHandler(evBlur, fnmapUpper);
+        expect(aw.className).not.toMatch(/visible/);
+      });
+
+      it("focus events add warning if capsLock state is on", function() {
+        capsLockCore.eventHandler(evLowerKeyP, fnmapUpper);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        capsLockCore.eventHandler(evCL, fnmapUpper);
+        expect(aw.className).toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        capsLockCore.eventHandler(evBlur, fnmapUpper);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        // prove that CapsLock state is "on"
+        expect(capsLockCore.isCapsLockOn()).toBe(true);
+
+        // just blurred from upper field, now focus on lower field
+        capsLockCore.eventHandler(evFocus, fnmapLower);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).toMatch(/visible/);
+        expect(capsLockCore.isCapsLockOn()).toBe(true);
+      });
+    }); // end describe test capsLockCore.eventHandler directly
+
+    describe("simulate registering eventHandler to DOM elem",function() {
+      var unameHandler;
+      var passwHandler;
+
+      beforeEach(function() {
+        var ea = document.getElementById("aboveWarning");
+        var eb = document.getElementById("belowWarning");
+        // these are functions that take an event object meant
+        // to be registered with the DOM as an event listener
+        unameHandler = capsLockEventHandler(ea);
+        passwHandler = capsLockEventHandler(eb);
+      });
+
+      it("handles keypresses - upper field", function() {
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        // test loginField (upper text field)
+        unameHandler(evLowerShiftKeyP);
+        expect(aw.className).toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        unameHandler(evLowerShiftKeyP);
+        expect(aw.className).toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        unameHandler(evLowerShiftKeyP);
+        expect(aw.className).toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+      });
+      it("blur events remove warning", function() {
+        unameHandler(evLowerKeyP);
+        expect(aw.className).not.toMatch(/visible/);
+
+        unameHandler(evCL);
+        expect(aw.className).toMatch(/visible/);
+
+        unameHandler(evBlur);
+        expect(aw.className).not.toMatch(/visible/);
+      });
+
+      it("focus events add warning if capsLock state is on", function() {
+        unameHandler(evLowerKeyP);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        unameHandler(evCL);
+        expect(aw.className).toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        unameHandler(evBlur);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).not.toMatch(/visible/);
+
+        // prove that CapsLock state is "on"
+        expect(capsLockCore.isCapsLockOn()).toBe(true);
+
+        // just blurred from upper field, now focus on lower field
+        passwHandler(evFocus);
+        expect(aw.className).not.toMatch(/visible/);
+        expect(bw.className).toMatch(/visible/);
+        expect(capsLockCore.isCapsLockOn()).toBe(true);
+      });
     });
-
-    it("handles keypresses - lower field", function() {
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
-
-      // test loginField (upper text field)
-      capsLockCore.eventHandler(evLowerShiftKeyP, fnmapLower);
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).toMatch(/visible/);
-
-      capsLockCore.eventHandler(evLowerShiftKeyP, fnmapLower);
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).toMatch(/visible/);
-
-      capsLockCore.eventHandler(evLowerShiftKeyP, fnmapLower);
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).toMatch(/visible/);
-    });
-
-    it("handles CapsLock keyup/down events - upper field", function() {
-      // Pressing CapsLock first should have no effect
-      capsLockCore.eventHandler(evCL, fnmapUpper);
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
-
-      capsLockCore.eventHandler(evCL, fnmapUpper);
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
-
-      // after pressing another key, CapsLock should toggle warnings
-      capsLockCore.eventHandler(evLowerShiftKeyP, fnmapUpper);
-      expect(aw.className).toMatch(/visible/);
-
-      capsLockCore.eventHandler(evCL, fnmapUpper);
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
-
-      capsLockCore.eventHandler(evCL, fnmapUpper);
-      expect(aw.className).toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
-    });
-
-    it("handles CapsLock keyup/down events - lower field", function() {
-      // Pressing CapsLock first should have no effect
-      capsLockCore.eventHandler(evCL, fnmapLower);
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
-
-      capsLockCore.eventHandler(evCL, fnmapLower);
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
-
-      // after pressing another key, CapsLock should toggle warnings
-      capsLockCore.eventHandler(evLowerShiftKeyP, fnmapLower);
-      expect(bw.className).toMatch(/visible/);
-
-      capsLockCore.eventHandler(evCL, fnmapLower);
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
-
-      capsLockCore.eventHandler(evCL, fnmapLower);
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).toMatch(/visible/);
-    });
-
-    it("blur events remove warning", function() {
-      capsLockCore.eventHandler(evLowerKeyP, fnmapUpper);
-      expect(aw.className).not.toMatch(/visible/);
-
-      capsLockCore.eventHandler(evCL, fnmapUpper);
-      expect(aw.className).toMatch(/visible/);
-
-      capsLockCore.eventHandler(evBlur, fnmapUpper);
-      expect(aw.className).not.toMatch(/visible/);
-    });
-
-    it("blur events leave warning off", function() {
-      capsLockCore.eventHandler(evLowerKeyP, fnmapUpper);
-      expect(aw.className).not.toMatch(/visible/);
-
-      capsLockCore.eventHandler(evCL, fnmapUpper);
-      expect(aw.className).toMatch(/visible/);
-
-      capsLockCore.eventHandler(evCL, fnmapUpper);
-      expect(aw.className).not.toMatch(/visible/);
-
-      capsLockCore.eventHandler(evBlur, fnmapUpper);
-      expect(aw.className).not.toMatch(/visible/);
-    });
-
-    it("focus events add warning if capsLock state is on", function() {
-      capsLockCore.eventHandler(evLowerKeyP, fnmapUpper);
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
-
-      capsLockCore.eventHandler(evCL, fnmapUpper);
-      expect(aw.className).toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
-
-      capsLockCore.eventHandler(evBlur, fnmapUpper);
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).not.toMatch(/visible/);
-
-      // prove that CapsLock state is "on"
-      expect(capsLockCore.isCapsLockOn()).toBe(true);
-
-      // just blurred from upper field, now focus on lower field
-      capsLockCore.eventHandler(evFocus, fnmapLower);
-      expect(aw.className).not.toMatch(/visible/);
-      expect(bw.className).toMatch(/visible/);
-      expect(capsLockCore.isCapsLockOn()).toBe(true);
-
-    });
-
   });
 });

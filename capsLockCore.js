@@ -60,7 +60,7 @@ var capsLockCore = (function() {
     capsLockOn = null;
   }
 
-  // DOM event handler for username field
+  // DOM event handler
   function eventHandler(e, fnmap) {
     if (/^key/.test(e.type)) {
       var state = analyzeEvent(e);
