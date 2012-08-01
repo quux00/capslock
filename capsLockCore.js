@@ -6,10 +6,6 @@ var capsLockCore = (function() {
 
   /* ---[ Private Helper Methods ]--- */
   
-  function getCharCode(e) {
-    return (typeof e.which === "number") ? e.which : e.keyCode;
-  }
-
   function toggleCapsLockState() {
     if (typeof capsLockOn === 'boolean') capsLockOn = !capsLockOn;
     return capsLockOn;
@@ -38,6 +34,10 @@ var capsLockCore = (function() {
   }
   
   /* ---[ Public Methods ]--- */
+
+  function getCharCode(e) {
+    return (typeof e.which === "number") ? e.which : e.keyCode;
+  }
 
   function analyzeEvent(e) {
     var prev = capsLockOn;
@@ -74,9 +74,11 @@ var capsLockCore = (function() {
 
   // return methods that are publicly available
   return {analyzeEvent: analyzeEvent,
+          eventHandler: eventHandler,
+          getCharCode: getCharCode,
           isCapsLockOn: isCapsLockOn,
-          reset: reset,
-          eventHandler: eventHandler};
+          reset: reset
+         };
 })();
 
 
