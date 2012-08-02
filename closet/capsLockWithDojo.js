@@ -10,15 +10,19 @@
   
   /**
    * @param element - DOM element to add listener to
-   * @param type - String event name, e.g., "click"
+   * @param types   - Array of String event name, e.g., []"click", "blur"]
    * @param handler - JS callback function when event occurs
    */
-  function bindEvent(element, type, handle) {
+  function bindEvents(element, types, handler) {
     if (element.addEventListener) {
-      element.addEventListener(type, handle, false);
+      for (var i=0; i < types.length; i++) {
+        element.addEventListener(types[i], handler, false);
+      }
 
     } else if (element.attachEvent) {
-      element.attachEvent("on" + type, handle);
+      for (var i=0; i < types.length; i++) {
+        element.attachEvent("on" + types[i], handler);
+      }
     }
   }
 
