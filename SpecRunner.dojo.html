@@ -1,5 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-  "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
 <head>
   <title>Jasmine Spec Runner</title>
@@ -7,17 +6,15 @@
   <link rel="shortcut icon" type="image/png" href="lib/jasmine-1.2.0/jasmine_favicon.png">
   <link rel="stylesheet" type="text/css" href="lib/jasmine-1.2.0/jasmine.css">
   <link rel="stylesheet" type="text/css" href="style/login.css">
+  <link rel="stylesheet" type="text/css" href="lib/dojo-1.4.1/dijit/themes/tundra/tundra.css">
   <script type="text/javascript" src="lib/jasmine-1.2.0/jasmine.js"></script>
   <script type="text/javascript" src="lib/jasmine-1.2.0/jasmine-html.js"></script>
 
   <!-- include source files here... -->
   <script type="text/javascript" src="lib/dojo-1.4.1/dojo/dojo.js"></script>
   <!-- TODO: check this! -->
-  <script type="text/javascript"> 
-    if (dojo)  console.log("DOJO FOUND 1");
-	  dojo.require("dijit.Tooltip");
-    if (dojo)  console.log("DOJO FOUND 2");
-    if (dijit) console.log("DIJIT FOUND");
+  <script type="text/javascript">
+    dojo.require("dijit.Tooltip");
   </script>
   <script type="text/javascript" src="capsLockCore.js"></script>
 
@@ -54,13 +51,13 @@
   </script>
 </head>
 
-<body>
-  <div id="loginDiv">
-    Login: <br>
-    <div id="aboveWarning" class="warn hidden">Warning: Caps Lock is On</div>
-    <input type="text" id="loginField"><br />
-    <input type="password" id="passwordField"><br />
-    <div id="belowWarning" class="warn hidden">Warning: Caps Lock is On</div>
-  </div>
+<body class="tundra">
+  <br><br>
+    <div id="loginDiv">
+      Login: <br>
+      <input type="text" id="loginField"><br>
+      <input type="password" id="passwordField"><br>
+    </div>
+    <br><br>
 </body>
 </html>

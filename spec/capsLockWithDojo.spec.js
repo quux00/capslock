@@ -1,135 +1,190 @@
-describe("CapsLockWithDojo", function() {
+describe("CapsLockWithDojo eventHandler", function() {
 
-  describe("eventHandler", function() {
-    var fnmapUpper;
-    var evLowerKeyP;
-    var evLowerShiftKeyP;
-    var evUpperNoShiftKeyUp;
-    var evUpperKeyDown;
-    var evCL;
-    var evFocus;
-    var evBlur;
+  var fnmapUpper;
+  var evLowerKeyP;
+  var evLowerShiftKeyP;
+  var evUpperNoShiftKeyUp;
+  var evUpperKeyDown;
+  var evCL;
+  var evFocus;
+  var evBlur;
 
-    var lf, pf;
+  var lf, pf;
 
-    var capsLockEventHandler;
+  var capsLockEventHandler;
+  var masterToolTip;
 
+  beforeEach(function() {
+    if (!lf) lf = document.getElementById("loginField");
+    if (!pf) pf = document.getElementById("passwordField");
+
+    // causes 'capsLockOn' to be false
+    evLowerKeyP = {which: 107, type: 'keypress'};
+
+    // causes 'capsLockOn' to be true
+    evLowerShiftKeyP = {which: 107, shiftKey: true, type: 'keypress'};
+
+    // these are keyup/down so should have no effect
+    evUpperNoShiftKeyUp = {which: 75, shiftKey: false, type: 'keyup'};
+    evUpperKeyDown = {which: 75, shiftKey: true, type: 'keydown'};
+
+    evCL = {keyCode: 20, type: 'keyup'};
+
+    evFocus = {type: 'focus'};
+    evBlur  = {type: 'blur'};
+
+    capsLockEventHandler = function(elem, pos) {
+      var h = new CLHandler(elem, pos);
+      return function(e) {
+        capsLockCore.eventHandler(e, h);
+      }
+    };
+
+    masterToolTip = function() {
+      return document.getElementById("dijit__MasterTooltip_0");
+      // <div id="dijit__MasterTooltip_0" class="dijitTooltip dijitTooltipBelow dijitTooltipABLeft" widgetid="dijit__MasterTooltip_0" style="">
+      // <div id="dijit__MasterTooltip_0" class="dijitTooltip dijitTooltipBelow dijitTooltipABLeft" widgetid="dijit__MasterTooltip_0" style="top: xx; left: xx; opacity: 1">
+    };
+    
+    function CLHandler(elem, pos) {
+      this.capsLockOn = function() {
+        dijit.showTooltip( "Caps Lock is On", elem, pos );
+      };
+      this.capsLockOff = function() {
+        dijit.hideTooltip( elem );
+      };
+      this.focus = function(val) {
+        if (val) this.capsLockOn();
+      };
+      this.blur = function(val) {
+        this.capsLockOff();
+      };
+    }
+  });
+
+  // afterEach(function() {
+  //   capsLockCore.reset();
+  // });
+  
+  it("should pass", function() {
+    expect(masterToolTip()).toBeFalsy();
+    expect(true).toBe(true);
+  });
+
+  describe("simulate registering eventHandler to DOM elem", function() {
+    var unameHandler;
+    var passwHandler;
+    var flag;
+    
     beforeEach(function() {
-      if (!lf) lf = document.getElementById("loginField");
-      if (!pf) pf = document.getElementById("passwordField");
+      // these are functions that take an event object meant
+      // to be registered with the DOM as an event listener
+      unameHandler = capsLockEventHandler(lf, ['above']);
+      passwHandler = capsLockEventHandler(pf, ['below']);
+      flag = false;
+    });
 
-      // causes 'capsLockOn' to be false
-      evLowerKeyP = {which: 107, type: 'keypress'};
+    it("does not turn on tooltip with lower case key press", function() {
+      expect(masterToolTip()).toBeFalsy();
 
-      // causes 'capsLockOn' to be true
-      evLowerShiftKeyP = {which: 107, shiftKey: true, type: 'keypress'};
+      runs(function() {
+        unameHandler(evLowerKeyP);
+        setTimeout(function() {
+          expect(masterToolTip()).toBeTruthy();
+          flag = true;
+        }, 700);
+      });
+           
+      waitsFor(function() {
+        return flag;
+      }, "", 750);
 
-      // these are keyup/down so should have no effect
-      evUpperNoShiftKeyUp = {which: 75, shiftKey: false, type: 'keyup'};
-      evUpperKeyDown = {which: 75, shiftKey: true, type: 'keydown'};
+      runs(function() {
+        expect(masterToolTip().style.opacity).toBeFalsy();
+      })
+    });
 
-      evCL = {keyCode: 20, type: 'keyup'};
+    it("turns on tooltip with lower case key press", function() {
+      expect(masterToolTip().style.opacity).toBeFalsy();
 
-      evFocus = {type: 'focus'};
-      evBlur  = {type: 'blur'};
+      runs(function() {
+        unameHandler(evLowerShiftKeyP);
+        setTimeout(function() {
+          flag = true;
+        }, 700);
+      });
+           
+      waitsFor(function() {
+        return flag;
+      }, "", 750);
 
-      capsLockEventHandler = function(elem) {
-        var h = new Handler(elem);
-        return function(e) {
-          capsLockCore.eventHandler(e, h);
-        }
-      }
+      runs(function() {
+        expect(masterToolTip().style.opacity).toBeTruthy();
+      });
+    });
+
+    it("turns tooltip off with blur", function() {
+      expect(masterToolTip().style.opacity).toBeTruthy();
+
+      runs(function() {
+        unameHandler(evBlur);
+        setTimeout(function() {
+          flag = true;
+        }, 700);
+      });
+
+      waitsFor(function() {
+        return flag;
+      }, "", 750);
+
+      runs(function() {
+        expect(masterToolTip().style.opacity).toBeFalsy();
+      });
+    });
       
-      function Handler(elem, pos) {
-        this.makeVisible = function(elem) {
-          dijit.showTooltip( "Caps Lock is On", elem, pos );
-        };
-        this.makeHidden = function(elem) {
-          dijit.hideTooltip( caller );
-        };
-        this.capsLockOn = function() {
-          this.makeVisible(elem);
-        };
-        this.capsLockOff = function() {
-          this.makeHidden(elem);
-        };
-        this.focus = function(val) {
-          if (val) this.capsLockOn();
-        };
-        this.blur = function(val) {
-          this.capsLockOff();
-        };
-      }
-
-      fnmapUpper = new Handler(lf, ["above"]);
-      fnmapLower = new Handler(pf, ["below"]);
-    });
-
-    afterEach(function() {
-      capsLockCore.reset();
-    });
-
-    describe("simulate registering eventHandler to DOM elem",function() {
-      var unameHandler;
-      var passwHandler;
-
-      beforeEach(function() {
-        // these are functions that take an event object meant
-        // to be registered with the DOM as an event listener
-        unameHandler = capsLockEventHandler(lf);
-        passwHandler = capsLockEventHandler(pf);
+    it("turns tooltip on and moves tooltip down with focus when capsLock still on", function() {
+      expect(capsLockCore.isCapsLockOn()).toBe(true);
+      expect(masterToolTip().style.opacity).toBeFalsy();
+      var vertPosPrev = masterToolTip().style.top;
+      var vertPosCurr;
+      
+      runs(function() {
+        passwHandler(evFocus);
+        setTimeout(function() {
+          flag = true;
+          vertPosCurr = masterToolTip().style.top;
+        }, 700);
       });
 
-      it("handles keypresses - upper field", function() {
-        // expect(aw.className).not.toMatch(/visible/);
-        // expect(bw.className).not.toMatch(/visible/);
+      waitsFor(function() {
+        return flag;
+      }, "", 750);
 
-        // test loginField (upper text field)
-        unameHandler(evLowerShiftKeyP);
-        // expect(aw.className).toMatch(/visible/);
-        // expect(bw.className).not.toMatch(/visible/);
-
-        unameHandler(evLowerShiftKeyP);
-        // expect(aw.className).toMatch(/visible/);
-        // expect(bw.className).not.toMatch(/visible/);
-
-        // unameHandler(evLowerShiftKeyP);
-        // expect(aw.className).toMatch(/visible/);
-        // expect(bw.className).not.toMatch(/visible/);
+      runs(function() {
+        expect(masterToolTip().style.opacity).toBeTruthy();
+        expect(vertPosCurr).toBeGreaterThan(vertPosPrev);
       });
-      // it("blur events remove warning", function() {
-      //   unameHandler(evLowerKeyP);
-      //   expect(aw.className).not.toMatch(/visible/);
+    });
 
-      //   unameHandler(evCL);
-      //   expect(aw.className).toMatch(/visible/);
+    it("turns toolTip off when CapsLock key pressed", function() {
+      expect(capsLockCore.isCapsLockOn()).toBe(true);
+      expect(masterToolTip().style.opacity).toBeTruthy();
 
-      //   unameHandler(evBlur);
-      //   expect(aw.className).not.toMatch(/visible/);
-      // });
+      runs(function() {
+        passwHandler(evCL);
+        setTimeout(function() {
+          flag = true;
+        }, 700);
+      });
 
-      // it("focus events add warning if capsLock state is on", function() {
-      //   unameHandler(evLowerKeyP);
-      //   expect(aw.className).not.toMatch(/visible/);
-      //   expect(bw.className).not.toMatch(/visible/);
+      waitsFor(function() {
+        return flag;
+      }, "", 750);
 
-      //   unameHandler(evCL);
-      //   expect(aw.className).toMatch(/visible/);
-      //   expect(bw.className).not.toMatch(/visible/);
-
-      //   unameHandler(evBlur);
-      //   expect(aw.className).not.toMatch(/visible/);
-      //   expect(bw.className).not.toMatch(/visible/);
-
-      //   // prove that CapsLock state is "on"
-      //   expect(capsLockCore.isCapsLockOn()).toBe(true);
-
-      //   // just blurred from upper field, now focus on lower field
-      //   passwHandler(evFocus);
-      //   expect(aw.className).not.toMatch(/visible/);
-      //   expect(bw.className).toMatch(/visible/);
-      //   expect(capsLockCore.isCapsLockOn()).toBe(true);
-      // });
+      runs(function() {
+        expect(capsLockCore.isCapsLockOn()).toBe(false);
+        expect(masterToolTip().style.opacity).toBeFalsy();
+      });
     });
   });
 });

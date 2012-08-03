@@ -1,3 +1,12 @@
+function addClass(elem, cname) {
+  elem.className += " " + cname;
+}
+
+function removeClass(elem, cname) {
+  var re = new RegExp("(?:^|\\s)" + cname + "(?!\\S)", 'g');
+  elem.className = elem.className.replace(re, '');
+}
+
 describe("CapsLockFunctions", function() {
   var expected;
 
@@ -12,7 +21,7 @@ describe("CapsLockFunctions", function() {
     });
 
     it("addClass should add class to DOM node", function() {
-      capsLock.addClass(node, "foo");
+      addClass(node, "foo");
       expect(node.className).toMatch(origClass);
       expect(node.className).toMatch(/\bfoo\b/);
     });
@@ -20,11 +29,11 @@ describe("CapsLockFunctions", function() {
     it("removeClass should remove class from DOM node", function() {
       expect(node.className).not.toMatch(/\bfoo\b/);
 
-      capsLock.addClass(node, "foo");
+      addClass(node, "foo");
       expect(node.className).toMatch(origClass);
       expect(node.className).toMatch(/\bfoo\b/);
 
-      capsLock.removeClass(node, "foo");
+      removeClass(node, "foo");
       expect(node.className).toMatch(origClass);
       expect(node.className).not.toMatch(/\bfoo\b/);
     });
@@ -76,12 +85,12 @@ describe("CapsLockFunctions", function() {
       
       function Handler(elem) {
         this.makeVisible = function(elem) {
-          capsLock.addClass(elem, "visible");
-          capsLock.removeClass(elem, "hidden");
+          addClass(elem, "visible");
+          removeClass(elem, "hidden");
         };
         this.makeHidden = function(elem) {
-          capsLock.addClass(elem, "hidden");
-          capsLock.removeClass(elem, "visible");
+          addClass(elem, "hidden");
+          removeClass(elem, "visible");
         };
         this.capsLockOn = function() {
           this.makeVisible(elem);

@@ -46,17 +46,18 @@ function enterKeyHandler(e) {
   if (capsLockCore.getCharCode(e) === 13) alert("Would login() now");
 }
 
-var login = document.getElementById("loginField");
-var passw = document.getElementById("passwordField");
+(function() {
+  var login = document.getElementById("loginField");
+  var passw = document.getElementById("passwordField");
 
-bindEvents(login,
-           ['keypress', 'keydown', 'blur', 'focus'],
-           capsLockEventHandler(login, ['above']));
+  bindEvents(login,
+             ['keypress', 'keydown', 'blur', 'focus'],
+             capsLockEventHandler(login, ['above']));
 
-bindEvents(passw,
-           ['keypress', 'keydown', 'blur', 'focus'],
-           capsLockEventHandler(passw, ['below']));
+  bindEvents(passw,
+             ['keypress', 'keydown', 'blur', 'focus'],
+             capsLockEventHandler(passw, ['below']));
 
-bindEvents(login, 'keyup', enterKeyHandler);
-bindEvents(passw, 'keyup', enterKeyHandler);
-
+  bindEvents(login, 'keyup', enterKeyHandler);
+  bindEvents(passw, 'keyup', enterKeyHandler);
+})();
