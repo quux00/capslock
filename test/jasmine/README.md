@@ -1,4 +1,9 @@
 These tests are meant to be with the Jasmine BDD testing framework: http://pivotal.github.com/jasmine/
+The jasmine-1.2 library is included in the lib directory of this repo.
+
+Unlike the jsTestDriver tests, this one does include HTML and a DOM to test against.  However, the events are still simulated via stubs, but the DOM is manipulated in response back on the actions of the event listeners registered with the capsLockCore library.
+
+----
 
 There are two tests:
 * capsLockSimpleWarnings.spec.js with SpecRunner.simpleWarnings.html

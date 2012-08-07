@@ -2,7 +2,8 @@ This is the 'first' and most basic test, since the test is run with no DOM / HTM
 
 These tests are meant to be run with Google's JsTestDriver: http://code.google.com/p/js-test-driver/
 
-Steps: 
+Steps:
+
 1. Install the JsTestDriver.jar
 2. Run the JsTestDriver server: `java -jar /path/to/JsTestDriver.jar --port 9876`
 3. Open one or more browsers to: http://localhost:9876/capture or http://localhost:9876/capture?strict for ECMAScript 5 strict mode testing
