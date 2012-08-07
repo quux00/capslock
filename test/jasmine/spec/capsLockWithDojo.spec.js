@@ -68,7 +68,6 @@ describe("CapsLockWithDojo eventHandler", function() {
   
   it("should pass", function() {
     expect(masterToolTip()).toBeFalsy();
-    expect(true).toBe(true);
   });
 
   describe("simulate registering eventHandler to DOM elem", function() {
@@ -92,12 +91,12 @@ describe("CapsLockWithDojo eventHandler", function() {
         setTimeout(function() {
           expect(masterToolTip()).toBeTruthy();
           flag = true;
-        }, 700);
+        }, 800);
       });
            
       waitsFor(function() {
         return flag;
-      }, "", 750);
+      }, "", 850);
 
       runs(function() {
         expect(masterToolTip().style.opacity).toBeFalsy();

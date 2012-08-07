@@ -1,4 +1,14 @@
+/**
+ * Caps Lock detection library for use with web browsers.
+ *
+ * Include this in your HTML and reference its exported functions
+ * via the capsLockCore "module" namespace handle.
+ * 
+ * @author Michael Peterson
+ * Aug 2012
+ */
 var capsLockCore = (function() {
+  "use strict";
   // keep track of whether capslock is on
   // three states: yes, no, unknown
   // unknown (null) until first non-CapsLock key is pressed
@@ -65,7 +75,8 @@ var capsLockCore = (function() {
     if (/^key/.test(e.type)) {
       var state = analyzeEvent(e);
       if (state.changed) {
-        state.on ? fnmap.capsLockOn() : fnmap.capsLockOff();
+        if (state.on) fnmap.capsLockOn();
+        else          fnmap.capsLockOff();
       }
     } else if (fnmap[e.type]) {
       fnmap[e.type]( capsLockCore.isCapsLockOn() );

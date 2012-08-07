@@ -1,0 +1,1 @@
+../../src/capsLockCore.js

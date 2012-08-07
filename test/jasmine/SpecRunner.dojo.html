@@ -3,20 +3,24 @@
 <head>
   <title>Jasmine Spec Runner</title>
   <meta charset="UTF-8">
-  <link rel="shortcut icon" type="image/png" href="lib/jasmine-1.2.0/jasmine_favicon.png">
-  <link rel="stylesheet" type="text/css" href="lib/jasmine-1.2.0/jasmine.css">
-  <link rel="stylesheet" type="text/css" href="style/login.css">
-  <link rel="stylesheet" type="text/css" href="lib/dojo-1.4.1/dijit/themes/tundra/tundra.css">
-  <script type="text/javascript" src="lib/jasmine-1.2.0/jasmine.js"></script>
-  <script type="text/javascript" src="lib/jasmine-1.2.0/jasmine-html.js"></script>
+  <link rel="shortcut icon" type="image/png" href="../lib/jasmine-1.2.0/jasmine_favicon.png">
+  <link rel="stylesheet" type="text/css" href="../lib/jasmine-1.2.0/jasmine.css">
+  <script type="text/javascript" src="../lib/jasmine-1.2.0/jasmine.js"></script>
+  <script type="text/javascript" src="../lib/jasmine-1.2.0/jasmine-html.js"></script>
+
+  <!-- include stylesheets here... -->
+  <link rel="stylesheet" type="text/css" href="../style/login.css">
+  <link rel="stylesheet" type="text/css" href="../lib/dojo-release-1.4.1/dijit/themes/tundra/tundra.css">
+  <!-- <link rel="stylesheet" type="text/css" href="dojo-release-1.4.1/dijit/themes/tundra/tundra.css"> -->
 
   <!-- include source files here... -->
-  <script type="text/javascript" src="lib/dojo-1.4.1/dojo/dojo.js"></script>
-  <!-- TODO: check this! -->
+  <script type="text/javascript" src="../lib/dojo-release-1.4.1/dojo/dojo.js"
+          djConfig="baseUrl: '../lib/dojo-release-1.4.1/dojo/'"></script>
+  <!-- <script type="text/javascript" src="dojo-release-1.4.1/dojo/dojo.js"></script> -->
   <script type="text/javascript">
     dojo.require("dijit.Tooltip");
   </script>
-  <script type="text/javascript" src="capsLockCore.js"></script>
+  <script type="text/javascript" src="../../src/capsLockCore.js"></script>
 
   <!-- include spec files here... -->
   <script type="text/javascript" src="spec/capsLockWithDojo.spec.js"></script>
