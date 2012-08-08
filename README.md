@@ -2,8 +2,9 @@
 
 This is a very small "CapsLock" library is provided in the src/capsLockCore.js file.  It is meant to provide detection of when the Caps Lock key is on in a web browser setting by watching keypress and keyup/keydown DOM events and reading the "keyCode" or "charCode" of the keypresses.
 
+See the test code examples for usage patterns.
 
-**Documentation Incomplete at Present**
+*Documentation Incomplete at Present*
 
 ## Tests
 
