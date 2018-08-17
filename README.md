@@ -12,7 +12,7 @@ I also include tests in 5 formats:
 
 1. A simple HTML and JS file for manual testing - see the `test/manual` directory.
 2. A test case for the Google's [JsTestDriver](http://code.google.com/p/js-test-driver/) unit test framework and test runner.  See the `test/jsTestDriver` directory.
-3. A BDD style test using [Jasmine](http://pivotal.github.com/jasmine/) - see the `test/jasmine`
+3. A BDD style test using [Jasmine](https://jasmine.github.io/) - see the `test/jasmine`
 directory.
 4. Selenium WebDriver tests - **In progress and not yet included**
 5. HtmlUnit tests -  **In progress and not yet included**
